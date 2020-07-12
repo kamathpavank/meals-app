@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:meal/category_meals.dart';
+import '../screens/category_meals.dart';
 
 class CategoryItem extends StatelessWidget {
+  final String id;
   final String title;
   final Color color;
 
-  CategoryItem(this.title, this.color);
+  CategoryItem(this.id, this.title, this.color);
 
   void selectCategory(BuildContext ctx) {
-    Navigator.of(ctx).push(MaterialPageRoute(
-      builder: (_) {
-        return CategoryMeals();
-      },
-    ));
+    Navigator.of(ctx).pushNamed(CategoryMeals.routeName, arguments: {
+      'id': id,
+      'title': title,
+    });
   }
 
   @override
