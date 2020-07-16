@@ -18,36 +18,58 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  Map<String,bool> _filters = {
-    'gluten':false,
-    'lactose':false,
-    'vegan':false,
-    'vegetarian':false,
+  Map<String, bool> _filters = {
+    'gluten': false,
+    'lactose': false,
+    'vegan': false,
+    'vegetarian': false,
   };
 
   List<Meal> _availableMeals = DUMMY_MEALS;
+  List<Meal> _favouriteMeals = [];
 
-  void _setFilters(Map<String,bool> filterData){
+  void _setFilters(Map<String, bool> filterData) {
     setState(() {
       _filters = filterData;
 
-      _availableMeals = DUMMY_MEALS.where((meal){
-        if(_filters['gluten'] && !meal.isGlutenFree){
+      _availableMeals = DUMMY_MEALS.where((meal) {
+        if (_filters['gluten'] && !meal.isGlutenFree) {
           return false;
         }
-        if(_filters['lactose'] && !meal.isLactoseFree){
+        if (_filters['lactose'] && !meal.isLactoseFree) {
           return false;
         }
-        if(_filters['vegan'] && !meal.isVegan){
+        if (_filters['vegan'] && !meal.isVegan) {
           return false;
         }
-        if(_filters['vegetarian'] && !meal.isVegetarian){
+        if (_filters['vegetarian'] && !meal.isVegetarian) {
           return false;
         }
         return true;
       }).toList();
     });
   }
+
+  void _toggleFavourite(String mealId) {
+    final existingIndex =
+        _favouriteMeals.indexWhere((meal) => meal.id == mealId);
+    if (existingIndex >= 0) {
+      setState(() {
+        _favouriteMeals.removeAt(existingIndex);
+      });
+    } else {
+      setState(() {
+        _favouriteMeals.add(
+          DUMMY_MEALS.firstWhere((meal) => meal.id == mealId),
+        );
+      });
+    }
+  }
+
+  bool isMealFavourite(String id){
+    return _favouriteMeals.any((meal) => meal.id == id);
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -65,16 +87,15 @@ class _MyAppState extends State<MyApp> {
                 color: Color.fromRGBO(20, 51, 51, 1),
               ),
               title: TextStyle(
-                fontSize: 20,
-                fontFamily: 'RobotoCondensed',
-                fontWeight: FontWeight.bold
-              ))),
+                  fontSize: 20,
+                  fontFamily: 'RobotoCondensed',
+                  fontWeight: FontWeight.bold))),
       initialRoute: '/',
       routes: {
-        '/':(ctx) => Tabs(),
+        '/': (ctx) => Tabs(_favouriteMeals),
         CategoryMeals.routeName: (ctx) => CategoryMeals(_availableMeals),
-        MealDetail.routeName: (ctx) => MealDetail(),
-        Filters.routeName: (ctx) => Filters(_setFilters,_filters),
+        MealDetail.routeName: (ctx) => MealDetail(_toggleFavourite,isMealFavourite),
+        Filters.routeName: (ctx) => Filters(_setFilters, _filters),
       },
       onGenerateRoute: (setttings) {
         print(setttings.arguments);
@@ -82,8 +103,8 @@ class _MyAppState extends State<MyApp> {
       },
       onUnknownRoute: (settings) {
         print(settings);
-        return MaterialPageRoute(builder: (ctx)=> Categories());
+        return MaterialPageRoute(builder: (ctx) => Categories());
       },
     );
   }
-} 
+}
