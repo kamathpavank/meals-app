@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:meal/screens/meal_detail.dart';
 import '../models/meal.dart';
@@ -10,14 +9,17 @@ class MealItem extends StatelessWidget {
   final int duration;
   final Complexity complexity;
   final Affordability affordability;
+  final Function removeItem;
 
-  MealItem(
-      {@required this.id,
-      @required this.title,
-      @required this.imageUrl,
-      @required this.affordability,
-      @required this.complexity,
-      @required this.duration});
+  MealItem({
+    @required this.id,
+    @required this.title,
+    @required this.imageUrl,
+    @required this.affordability,
+    @required this.complexity,
+    @required this.duration,
+    @required this.removeItem,
+  });
 
   String get complexityText {
     switch (complexity) {
@@ -52,10 +54,17 @@ class MealItem extends StatelessWidget {
   }
 
   void selectMeal(BuildContext context) {
-    Navigator.of(context).pushNamed(
+    Navigator.of(context)
+        .pushNamed(
       MealDetail.routeName,
       arguments: id,
-    );
+    )
+        .then((result) {
+      //These function is executed when above route page is popped
+      if(result != null){
+        removeItem(result);
+      }
+    });
   }
 
   @override
